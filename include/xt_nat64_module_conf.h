@@ -1,7 +1,6 @@
 #ifndef _XT_NAT64_MODULE_CONF_H
 #define _XT_NAT64_MODULE_CONF_H
 
-
 /*
  * Communication with the NAT64 module (using netlink sockets).
  */
