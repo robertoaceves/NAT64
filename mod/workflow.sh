@@ -3,13 +3,17 @@
 config_file="../etc/nat64_configuration/nat64.conf"
 if [ -f "$config_file" ]; then
 	pool_net=`awk '/ipv4_addr_net[ =]/{printf "%s/",$3} /ipv4_addr_net_mask_bits/{printf "%d\n",$3}' "$config_file"`
-	pref64=`awk '/ipv6_net_prefix/{printf "%s/",$3} /ipv6_net_mask_bits/{printf "%d\n",$3}' "$config_file"`
+	pref64=`awk '/ipv6_net_prefixes/{ gsub(/"/,"",$4); gsub(/,/,"",$4); print $4} ' "$config_file"`
 else
 	echo "NAT64. WARNING. Configuration file NOT found. Using default values"
 	header_file="../include/xt_nat64_module_conf.h"
 	pool_net=` awk '/IPV4_DEF_NET/{gsub(/[\"]/,"",$3); printf "%s/",$3} /IPV4_DEF_MASKBITS/{printf "%d\n",$3}'  "$header_file"`
 	pref64=` awk '/IPV6_DEF_PREFIX/{gsub(/[\"]/,"",$3); printf "%s/",$3} /IPV6_DEF_MASKBITS/{printf "%d\n",$3}'  "$header_file"`
+
 fi
+
+echo "=== pool_net: $pool_net"
+echo "=== pref64: $pref64"
 
 if [ $1 = "ins" ] ; then
 	sudo modprobe ipv6

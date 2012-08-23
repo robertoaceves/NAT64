@@ -35,6 +35,9 @@ extern unsigned char ipv6_pref_len;	// Var type verified ;). Rob
 int init_nat_config(struct config_struct *cs)
 {
 	struct ipv6_prefixes ip6p;
+	
+	int i = 0;
+	
 	/* IPv4 */
 	// IPv4 Pool Network
     if (! in4_pton(IPV4_DEF_NET, -1, (u8 *)&ipv4_pool_net.s_addr, '\x0', NULL)) {
@@ -80,18 +83,23 @@ int init_nat_config(struct config_struct *cs)
     //
     (*cs).ipv4_udp_port_first = IPV4_DEF_UDP_POOL_FIRST;
     (*cs).ipv4_udp_port_last = IPV4_DEF_UDP_POOL_LAST;
-
+pr_debug("paso: %d", i++);
     //// IPv6:
 	if (! in6_pton(IPV6_DEF_PREFIX, -1, (u8 *)&(ip6p.addr), '\0', NULL)) {
         pr_warning("NAT64: IPv6 prefix in Headers is malformed [%s].", IPV6_DEF_PREFIX);
         return -EINVAL;
     }
+pr_debug("paso: %d", i++);
 	ip6p.maskbits = IPV6_DEF_MASKBITS;
-	
-	(*cs).ipv6_net_prefixes[0] = (struct ipv6_prefixes*) kmalloc(sizeof(struct ipv6_prefixes), GFP_ATOMIC);
-
+pr_debug("paso: %d", i++);
+	cs->ipv6_net_prefixes = (struct ipv6_prefixes**) kmalloc(1*sizeof(struct ipv6_prefixes*), GFP_ATOMIC);
+pr_debug("paso: %d", i++);
+	cs->ipv6_net_prefixes[0] = (struct ipv6_prefixes*) kmalloc(sizeof(struct ipv6_prefixes), GFP_ATOMIC);
+pr_debug("paso: %d", i++);
 	(*(*cs).ipv6_net_prefixes[0]) = ip6p;
+pr_debug("paso: %d", i++);	
 	(*cs).ipv6_net_prefixes_qty = 1;
+pr_debug("paso: %d", i++);	
     //
 	(*cs).ipv6_tcp_port_range_first = IPV6_DEF_TCP_POOL_FIRST;
 	(*cs).ipv6_tcp_port_range_last = IPV6_DEF_TCP_POOL_LAST;
@@ -116,6 +124,9 @@ int init_nat_config(struct config_struct *cs)
  */
 int update_nat_config(struct config_struct *cst)
 {
+	unsigned char i = 0;
+	unsigned char qty = 0;
+
 	cs = (*cst);
 	
 	// FIXME: Esto no se está actualizando, hacerlo!,
@@ -128,8 +139,12 @@ int update_nat_config(struct config_struct *cst)
 			  &(cs.ipv4_addr_net), (cs).ipv4_addr_net_mask_bits, &ipv4_netmask);
 	//~ pr_debug("NAT64:	and IPv6 prefix %pI6c/%d.",
 			  //~ &(cs.ipv6_net_prefix), cs.ipv6_net_mask_bits);
-	pr_debug("NAT64:	and IPv6 prefix %pI6c/%d.",
-			  &((cs).ipv6_net_prefixes[0]->addr), (cs).ipv6_net_prefixes[0]->maskbits);
+	qty = (cs).ipv6_net_prefixes_qty;
+	for (i = 0; i < qty; i++)
+	{
+		pr_debug("NAT64:	and IPv6 prefix %pI6c/%d.",
+			  &((cs).ipv6_net_prefixes[i]->addr), (cs).ipv6_net_prefixes[i]->maskbits);
+	}
 
 	// Update IPv4 addresses pool
     init_pools(&cs); // Bernardo

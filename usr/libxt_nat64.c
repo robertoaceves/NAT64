@@ -9,14 +9,14 @@
 #include "libxt_nat64.h"
 
 
-static const struct option nat64_tg_opts[] = {
+ const struct option nat64_tg_opts[] = {
 	{.name = "ipsrc", .has_arg = true, .val = '1'},
 	{.name = "ipdst", .has_arg = true, .val = '2'},
 	{.name = "outdev", .has_arg = true, .val = '3'},
 	{NULL},
 };
 
-static struct xtables_target nat64_tg4_reg = {
+ struct xtables_target nat64_tg4_reg = {
 	.version = XTABLES_VERSION,
 	.name = "nat64",
 	.revision = 0,
@@ -31,7 +31,7 @@ static struct xtables_target nat64_tg4_reg = {
 	.extra_opts = nat64_tg_opts,
 };
 
-static struct xtables_target nat64_tg6_reg = {
+ struct xtables_target nat64_tg6_reg = {
 	.version = XTABLES_VERSION,
 	.name = "nat64",
 	.revision = 0,
@@ -47,7 +47,7 @@ static struct xtables_target nat64_tg6_reg = {
 };
 
 
-static void nat64_tg4_save(const void *entry, const struct xt_entry_target *target)
+ void nat64_tg4_save(const void *entry, const struct xt_entry_target *target)
 {
 	const struct xt_nat64_tginfo *info = (const void *)target->data;
 
@@ -62,7 +62,7 @@ static void nat64_tg4_save(const void *entry, const struct xt_entry_target *targ
 	}
 }
 
-static void nat64_tg6_save(const void *entry, const struct xt_entry_target *target)
+ void nat64_tg6_save(const void *entry, const struct xt_entry_target *target)
 {
 	const struct xt_nat64_tginfo *info = (const void *)target->data;
 
@@ -74,7 +74,7 @@ static void nat64_tg6_save(const void *entry, const struct xt_entry_target *targ
 }
 
 
-static void nat64_tg4_print(const void *entry,
+ void nat64_tg4_print(const void *entry,
 		const struct xt_entry_target *target, int numeric)
 {
 	const struct xt_nat64_tginfo *info = (const void *)target->data;
@@ -98,7 +98,7 @@ static void nat64_tg4_print(const void *entry,
 }
 
 
-static void nat64_tg6_print(const void *entry,
+ void nat64_tg6_print(const void *entry,
 		const struct xt_entry_target *target, int numeric)
 {
 	const struct xt_nat64_tginfo *info = (const void *)target->data;
@@ -112,7 +112,7 @@ static void nat64_tg6_print(const void *entry,
 	}
 }
 
-static int nat64_tg4_parse(int c, char **argv, int invert,
+ int nat64_tg4_parse(int c, char **argv, int invert,
 		unsigned int *flags, const void *entry,
 		struct xt_entry_target **target)
 {
@@ -197,7 +197,7 @@ static int nat64_tg4_parse(int c, char **argv, int invert,
 	return false;
 }
 
-static int nat64_tg6_parse(int c, char **argv, int invert,
+ int nat64_tg6_parse(int c, char **argv, int invert,
 		unsigned int *flags, const void *entry,
 		struct xt_entry_target **target)
 {
@@ -266,7 +266,7 @@ static int nat64_tg6_parse(int c, char **argv, int invert,
 	return false;
 }
 
-static void nat64_tg_check(unsigned int flags)
+ void nat64_tg_check(unsigned int flags)
 {
 	if (flags == 0)
 		xtables_error(PARAMETER_PROBLEM, "xt_nat64: You need to "
@@ -279,7 +279,7 @@ static void nat64_tg_check(unsigned int flags)
 }
 
 
-static void nat64_tg_help(void)
+ void nat64_tg_help(void)
 {
 	printf(
 			"nat64 target options:\n"

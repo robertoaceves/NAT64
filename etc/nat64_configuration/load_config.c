@@ -195,6 +195,7 @@ int main(int argc, char *argv[])
         
 
         ipv6_pref_qty = cfg_size(cfg_ipv6, "ipv6_net_prefixes"); 
+        ipv6_pref = (struct ipv6_prefixes **) malloc(ipv6_pref_qty * sizeof(struct ipv6_prefixes *));
         for(i = 0; i < ipv6_pref_qty; i++)
         {
 printf("Hello");
@@ -223,7 +224,6 @@ printf("Validando prefijos ipv6\n");
 			ipv6_pref[i] = (struct ipv6_prefixes *) malloc(sizeof(struct ipv6_prefixes));
 			ipv6_pref[i]->addr = (i6addrf);
 			ipv6_pref[i]->maskbits = addr_maskbits;
-			ipv6_pref_qty = i + 1;
 			
 			//~ memset(ipv6_buf, '\0', sizeof(ipv6_buf));
         }
@@ -231,7 +231,7 @@ printf("Validando prefijos ipv6\n");
         cs.ipv6_net_prefixes_qty = ipv6_pref_qty;
 			
         
- return 0;       
+ // return 0; // validate validation      
         
         //
         port_first = cfg_getint(cfg_ipv6, "ipv6_tcp_port_range_first");

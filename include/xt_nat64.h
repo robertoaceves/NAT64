@@ -1,7 +1,9 @@
 #ifndef _XT_NAT64_H
 #define _XT_NAT64_H
 
-#include <linux/module.h>
+#ifdef _KERNEL_SPACE
+	#include <linux/module.h>
+#endif
 
 /**
  * @file

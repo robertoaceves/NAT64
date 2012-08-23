@@ -1,8 +1,9 @@
+#define _KERNEL_SPACE
+
 #include <net/route.h>
 #include <net/ip6_route.h>
 #include <linux/version.h>
 #include <linux/module.h>
-
 
 #include "xt_nat64.h"
 #include "nf_nat64_banner.h"
@@ -93,6 +94,9 @@ int my_rcv_msg(struct sk_buff *skb, struct nlmsghdr *nlh)
 
 void my_nl_rcv_msg(struct sk_buff *skb)
 {
+
+    pr_debug("NAT64:     netlink: message arrived.\n" );
+
     mutex_lock(&my_mutex);
     netlink_rcv_skb(skb, &my_rcv_msg);
     mutex_unlock(&my_mutex);
@@ -606,6 +610,7 @@ int __init nat64_init(void)
         pr_warning("NAT64: %s: Creation of netlink socket failed.\n", __func__);
         goto error;
     } 
+    pr_debug("NAT64: Netlink socket created.\n");
     // END
 
     return xt_register_target(&nat64_tg_reg);
