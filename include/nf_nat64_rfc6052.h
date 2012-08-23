@@ -18,6 +18,7 @@
  * @return the IPv4 version of the "addr" address using the "prefix" prefix.
  * @see RFC 6052 section 2.3.
  */
-__be32 nat64_extract_ipv4(struct in6_addr addr, int prefix);
+//__be32 nat64_extract_ipv4(struct in6_addr addr, int prefix);
+__be32 nat64_extract_ipv4(struct in6_addr addr, unsigned char prefix);
 
 #endif /* _NF_NAT64_RFC6052_H */

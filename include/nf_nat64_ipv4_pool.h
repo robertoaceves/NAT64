@@ -1,12 +1,6 @@
 #ifndef _NF_NAT64_IPV4_POOL_H
 #define _NF_NAT64_IPV4_POOL_H
 
-
-//~ #define FIRST_ADDRESS "192.168.2.1"
-//~ #define LAST_ADDRESS "192.168.2.20"
-//~ #define FIRST_PORT 1024
-//~ #define LAST_PORT 65534
-
 #include <linux/slab.h>
 #include <linux/inet.h>
 #include "xt_nat64_module_conf.h"

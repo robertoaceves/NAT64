@@ -22,14 +22,16 @@ extern struct expiry_q expiry_base[NUM_EXPIRY_QUEUES];
 
 extern struct in_addr ipv4_pool_range_first;
 extern struct in_addr ipv4_pool_range_last;
-extern int ipv6_pref_len;
+//extern int ipv6_pref_len;
+extern unsigned char ipv6_pref_len;
 
 /*
  * This procedure performs packet filtering and
  * updates BIBs and STs.
  */
 bool nat64_filtering_and_updating(u_int8_t l3protocol, u_int8_t l4protocol, 
-        struct sk_buff *skb, struct nf_conntrack_tuple * inner)
+        struct sk_buff *skb, unsigned char netmask, 
+        struct nf_conntrack_tuple * inner)
 {
     struct nat64_bib_entry *bib;
     struct nat64_st_entry *session;
@@ -123,7 +125,7 @@ bool nat64_filtering_and_updating(u_int8_t l3protocol, u_int8_t l4protocol,
             case IPPROTO_ICMPV6:
                 //Query ICMPV6 ST
                 pr_debug("NAT64: ICMPv6 protocol not "
-                        "currently supported.");
+                        "expected in this network.");
                 break;
             default:
                 //Drop packet
@@ -158,7 +160,6 @@ bool nat64_filtering_and_updating(u_int8_t l3protocol, u_int8_t l4protocol,
                     session = nat64_session_ipv4_lookup(bib, 
                             nat64_extract_ipv4(
                                 inner->dst.u3.in6, 
-                                //prefix_len), 
                             ipv6_pref_len), 
                             inner->dst.u.tcp.port);
                     if(session) {
@@ -169,7 +170,6 @@ bool nat64_filtering_and_updating(u_int8_t l3protocol, u_int8_t l4protocol,
                                 &(inner->dst.u3.in6), 
                                 nat64_extract_ipv4(
                                     inner->dst.u3.in6, 
-                                    //prefix_len), 
                                 ipv6_pref_len), 
                                 inner->dst.u.tcp.port, 
                                 TCP_TRANS);
@@ -181,7 +181,6 @@ bool nat64_filtering_and_updating(u_int8_t l3protocol, u_int8_t l4protocol,
                             &(inner->dst.u3.in6), 
                             nat64_extract_ipv4(
                                 inner->dst.u3.in6, 
-                                //prefix_len), 
                             ipv6_pref_len), 
                         inner->src.u.tcp.port, 
                         inner->dst.u.tcp.port, 
@@ -239,8 +238,8 @@ bool nat64_filtering_and_updating(u_int8_t l3protocol, u_int8_t l4protocol,
                 break;
             case IPPROTO_ICMP:
                 //Query ICMP ST
-                pr_debug("NAT64: ICMP protocol not currently "
-                        "supported.");
+                pr_debug("NAT64: ICMP protocol not expected "
+                        "on this network.");
                 break;
             case IPPROTO_ICMPV6:
                 //Query ICMPV6 ST
@@ -249,9 +248,8 @@ bool nat64_filtering_and_updating(u_int8_t l3protocol, u_int8_t l4protocol,
                 if(bib) {
                     session = nat64_session_ipv4_lookup(bib, 
                             nat64_extract_ipv4(
-                                inner->dst.u3.in6, 
-                                //prefix_len), 
-                            ipv6_pref_len), 
+                                inner->dst.u3.in6,  
+								ipv6_pref_len), 
                             inner->src.u.icmp.id);
                     if(session) {
                         nat64_session_renew(session, ICMP_DEFAULT);
@@ -300,7 +298,7 @@ end:
 
 struct nf_conntrack_tuple * nat64_determine_outgoing_tuple(
         u_int8_t l3protocol, u_int8_t l4protocol, struct sk_buff *skb, 
-        struct nf_conntrack_tuple * inner)
+        unsigned char netmask, struct nf_conntrack_tuple * inner)
 {
     struct nat64_bib_entry *bib = NULL;
     struct nat64_st_entry *session = NULL;
@@ -505,20 +503,20 @@ struct nf_conntrack_tuple * nat64_determine_outgoing_tuple(
                 case IPPROTO_TCP:
                     session = nat64_session_ipv4_lookup(bib, 
                             nat64_extract_ipv4(inner->dst.u3.in6, 
-                                //prefix_len), inner->dst.u.tcp.port);
-                            ipv6_pref_len), inner->dst.u.tcp.port);
+								ipv6_pref_len), 
+							inner->dst.u.tcp.port);
                     break;
                 case IPPROTO_UDP:
                     session = nat64_session_ipv4_lookup(bib, 
                             nat64_extract_ipv4(inner->dst.u3.in6, 
-                                //prefix_len), inner->dst.u.udp.port);
-                            ipv6_pref_len), inner->dst.u.udp.port);
+								ipv6_pref_len), 
+							inner->dst.u.udp.port);
                     break;
                 case IPPROTO_ICMPV6:
                     session = nat64_session_ipv4_lookup(bib, 
                             nat64_extract_ipv4(inner->dst.u3.in6, 
-                                //prefix_len), inner->dst.u.udp.port);
-                            ipv6_pref_len), inner->src.u.icmp.id);
+								ipv6_pref_len), 
+							inner->src.u.icmp.id);
                     break;
                 default:
                     pr_debug("NAT64: no hay sesion, lol, jk?");
@@ -611,6 +609,8 @@ error:
     return NULL;
 }
 
+// FIXME: Get rid of global variables, specifically: "ipv4_pool_range_first" and "ipv4_pool_range_last" , 
+//		  use "config_struct" instead.
 bool nat64_got_hairpin(u_int8_t l3protocol, struct nf_conntrack_tuple * outgoing) {
 	bool res;	  	
 	struct in_addr sa1;
@@ -631,6 +631,7 @@ bool nat64_got_hairpin(u_int8_t l3protocol, struct nf_conntrack_tuple * outgoing
 }
 
 struct nf_conntrack_tuple * nat64_hairpinning_and_handling(u_int8_t l4protocol, 
+		unsigned char netmask, 
 		struct nf_conntrack_tuple * inner,
 		struct nf_conntrack_tuple * outgoing) {
 	struct nat64_bib_entry *bib;

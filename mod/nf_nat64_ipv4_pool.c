@@ -22,7 +22,8 @@ __be32 ipv4_netmask;	// TODO change data type -> 'in_addr' type. Rob.
 
 /* IPv6. These ones are also global. */
 char *ipv6_pref_addr_str;
-int ipv6_pref_len;	// Var type verified ;). Rob
+//int ipv6_pref_len;	// Var type verified ;). Rob
+unsigned char ipv6_pref_len;	// Var type verified ;). Rob
 
 
 
@@ -50,6 +51,8 @@ static char *ip_address_to_string(__be32 ip)
 	return result;
 }
 
+// FIXME: Why is this function converting "new_transport_addr->address" to string??, and in the function 
+//		  nat64_bib_session_create() changes it back to "in_addr"
 static struct transport_addr_struct *get_transport_addr(struct list_head *head,
         int *next_address, int *next_port, int *first_port, int *last_port)
 {

@@ -1,27 +1,30 @@
 CC = gcc
-INCDIRS = -Iinclude -I../../include
-CFLAGS += -Wall ${INCDIRS} 
-LD = ld 
+LD = ld
+
+INCDIRS += -Iinclude -I../../include 
+INCDIRS += $(shell pkg-config --cflags libnl-3.0)
+CFLAGS += -Wall ${INCDIRS}
+
+KERNEL_VER = $(shell uname -r | cut -d'-' -f1| cut -f1 -d.)
 # For netlink sockets include library: libnl
-LDFLAGS += -lnl
+ifeq "${KERNEL_VER}" "2"
+#	For Ubntu 10.04
+LDLIBS += -lnl
+$(info Compiling on kernel family 2)
+else
+# 	For Ubuntu 12.04
+LDLIBS += $(shell pkg-config --libs libnl-3.0)
+$(info Compiling on kernel family 3)
+endif
 
 # Programs to compile:
 progs = load_config 
-
-
-# To read one or more other makefiles before continuing
-#include filenames...
-# a typical `descend into a directory' recipe then looks like this:
-#${subdirs}:
-#	${MAKE} -C $@ all
-
 
 default: all
 
 all: $(progs)
 
 load_config:load_config.o include/confuse.o include/lexer.o
-#	$(CC) $(CCFLAGS) load_config.c include/confuse.c include/lexer.c -o load_config
 load_config.o: load_config.c
 include/confuse.o:include/confuse.c
 include/lexer.o:include/lexer.c

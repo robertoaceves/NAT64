@@ -47,7 +47,9 @@ extern __be32 ipv4_netmask;	// TODO change data type -> 'in_addr' type. Rob.
 
 /* IPv6 */
 extern char *ipv6_pref_addr_str; // puede hacerse local.
-extern int ipv6_pref_len; // es lo mismos que config_struct.ipv6_net_mask_bits.
+//extern int ipv6_pref_len; // es lo mismos que config_struct.ipv6_net_mask_bits.
+extern unsigned char ipv6_pref_len; // es lo mismos que config_struct.ipv6_net_mask_bits.
+
 
 extern struct config_struct cs;
 
@@ -324,6 +326,35 @@ bool nat64_tg6_cmp(const struct in6_addr * ip_a,
 	return false;
 }
 
+
+/* Convert struct in6_addr netmask into integer. */
+unsigned char ip6_masklen(struct in6_addr netmask)
+{
+	unsigned char len = 0;
+	unsigned char val;
+	unsigned char *pnt;
+
+	pnt = (unsigned char *) & netmask;
+
+	while ((*pnt == 0xff) && len < 128)
+	{
+		len += 8;
+		pnt++;
+	}
+
+	if (len < 128)
+	{
+		val = *pnt;
+		while (val)
+		{
+			len++;
+			val <<= 1;
+		}
+	}
+	return len;
+}
+
+
 /*
  * NAT64 Core Functionality
  *
@@ -336,20 +367,33 @@ unsigned int nat64_core(struct sk_buff *skb,
     struct nf_conntrack_tuple * outgoing;
     struct sk_buff * new_skb;
     bool hairpin = false;
+	struct in6_addr ip6netmask;
+	unsigned char netmask;
+	const struct xt_nat64_tginfo *info = par->targinfo;
+
+if (l3protocol == NFPROTO_IPV6) {	
+	ip6netmask = (struct in6_addr)info->ip6dst_mask.in6;
+	netmask = ip6_masklen(ip6netmask);
+	pr_debug("NAT64: CORE: mascara de red: %d", netmask);
+}
+else
+{
+	netmask = 0;
+}		
 
     if (!nat64_determine_incoming_tuple(l3protocol, l4protocol, skb, &inner)) {
         pr_info("NAT64: There was an error determining the Tuple");
         return NF_DROP;
     } 
 
-    if (!nat64_filtering_and_updating(l3protocol, l4protocol, skb, &inner)) {
+    if (!nat64_filtering_and_updating(l3protocol, l4protocol, skb, netmask, &inner)) {
 		pr_info("NAT64: There was an error in the updating and"
 			" filtering module");
 		return NF_DROP;
     }
 
     outgoing = nat64_determine_outgoing_tuple(l3protocol, l4protocol, 
-        skb, &inner);
+        skb, netmask, &inner);
 
     if (!outgoing) {
     	pr_info("NAT64: There was an error in the determining the outgoing"
@@ -359,7 +403,7 @@ unsigned int nat64_core(struct sk_buff *skb,
 
     if (  nat64_got_hairpin(l3protocol, outgoing) ){
 		pr_debug("NAT64: hairpin packet yo!");
-		outgoing = nat64_hairpinning_and_handling(l4protocol, &inner, outgoing);
+		outgoing = nat64_hairpinning_and_handling(l4protocol, netmask, &inner, outgoing);
 		l3protocol = NFPROTO_IPV6;
 		hairpin = true;
     }
@@ -455,23 +499,22 @@ unsigned int nat64_tg6(struct sk_buff *skb,
     pr_debug("PKT SRC=%pI6c \n", &iph->saddr);
     pr_debug("PKT DST=%pI6c \n", &iph->daddr);
     pr_debug("RULE DST=%pI6c \n", &info->ip6dst.in6);
-    pr_debug("RULE DST_MSK=%pI6c \n", &info->ip6dst_mask);
+    pr_debug("RULE DST_MSK=%pI6c \n", &info->ip6dst_mask.in6);
 
     /*
      * If the packet is not directed towards the NAT64 prefix, 
      * continue through the Netfilter rules.
      */
-    if (!nat64_tg6_cmp(&info->ip6dst.in6, &info->ip6dst_mask.in6, 
+    if (nat64_tg6_cmp(&info->ip6dst.in6, &info->ip6dst_mask.in6, 
                 &iph->daddr, info->flags))
-        return NF_ACCEPT;
-
-    if (l4_protocol & NAT64_IPV6_ALLWD_PROTOS) {
-        /*
-         * Core functions of the NAT64 implementation.
-         */
-        return nat64_core(skb, par, NFPROTO_IPV6, l4_protocol);
-    }
-
+    {     
+		if (l4_protocol & NAT64_IPV6_ALLWD_PROTOS) {
+			/*
+			 * Core functions of the NAT64 implementation.
+			 */
+			return nat64_core(skb, par, NFPROTO_IPV6, l4_protocol);
+		}
+	}
     /*
      * If the packet's protocol is not one of the ones defined for NAT64,
      * accept it.
@@ -508,7 +551,7 @@ int nat64_tg_check(const struct xt_tgchk_param *par)
                 par->family);
     return ret;
 }
-
+	
 struct xt_target nat64_tg_reg __read_mostly = {
     .name = "nat64",
     .revision = 0,

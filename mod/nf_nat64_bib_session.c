@@ -541,11 +541,12 @@ struct nat64_bib_entry *nat64_bib_create_icmp(struct in6_addr *remote6_addr, __b
 		return NULL;
 	}
 
+	// FIXME: ICMP doesn't use "ports", change this to "packet identifier". Rob
 	bib->type = type;
-	memcpy(&bib->remote6_addr, remote6_addr, sizeof(struct in6_addr));
-	bib->local4_addr = local4_addr;
-	bib->remote6_port = remote6_port;
-	bib->local4_port = local4_port; // FIXME: Should be different than the remote6_port.
+	memcpy(&bib->remote6_addr, remote6_addr, sizeof(struct in6_addr));	// S' (=X') addr
+	bib->local4_addr = local4_addr;	// T addr
+	bib->remote6_port = remote6_port;	// i1 (=x) port
+	bib->local4_port = local4_port; // i2 (=t) port 
 	INIT_LIST_HEAD(&bib->sessions);
 	pr_debug("NAT64: [bib] New bib %pI6c,%hu <--> %pI4:%hu.\n", remote6_addr, ntohs(remote6_port), &local4_addr, ntohs(
 	        local4_port));
@@ -576,6 +577,7 @@ struct nat64_bib_entry *nat64_bib_create_tcp(struct in6_addr *remote6_addr, __be
 	return bib;
 }
 
+// FIXME: Rename functions like this to indicate they process UDP packets, e.g. nat64_bib_session_create_udp
 struct nat64_bib_entry *nat64_bib_session_create(struct in6_addr *saddr, struct in6_addr *in6_daddr, __be32 daddr,
         __be16 sport, __be16 dport, int protocol, enum expiry_type type)
 {
@@ -600,6 +602,7 @@ struct nat64_bib_entry *nat64_bib_session_create(struct in6_addr *saddr, struct 
 		} else {
 			local4_port = ntohs(transport_addr->port);
 		}
+		// FIXME: 
 		in4_pton(transport_addr->address, -1, (u8 *) &local4_addr, '\x0', NULL);
 		pr_debug("NAT: IPv4 Pool: using address %s and port %u.\n", transport_addr->address, transport_addr->port);
 	}
@@ -628,6 +631,7 @@ struct nat64_bib_entry *nat64_bib_session_create(struct in6_addr *saddr, struct 
 	return bib;
 }
 
+// FIXME: ICMP doesn't use 'ports', change this to 'identifiers'
 struct nat64_bib_entry *nat64_bib_session_create_icmp(struct in6_addr *saddr, struct in6_addr *in6_daddr, __be32 daddr,
         __be16 sport, __be16 dport, int protocol, enum expiry_type type)
 {
@@ -650,6 +654,7 @@ struct nat64_bib_entry *nat64_bib_session_create_icmp(struct in6_addr *saddr, st
 			local4_port = sport;
 
 		} else {
+			// FIXME: Is this the correct way of translate (or assign) the i2 packet identifier.
 			local4_port = ntohs(transport_addr->port);
 		}
 		in4_pton(transport_addr->address, -1, (u8 *) &local4_addr, '\x0', NULL);
@@ -672,7 +677,8 @@ struct nat64_bib_entry *nat64_bib_session_create_icmp(struct in6_addr *saddr, st
 	//	hlist_add_head(&bib->bylocal, &hash4[sport]);
 
 	// XXX por qué se calcula session?
-	session = nat64_session_create(bib, in6_daddr, daddr, dport, type);
+	// session = nat64_session_create(bib, in6_daddr, daddr, dport, type);
+	session = nat64_session_create_icmp(bib, in6_daddr, daddr, dport, type);
 	if (!session) {
 		kmem_cache_free(bib_cacheICMP, bib);
 		return NULL;

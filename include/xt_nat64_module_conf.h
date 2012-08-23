@@ -20,8 +20,10 @@
 ////////////////////////////////////////////////////////////////////////
 
 // IPv6:
-#define IPV6_DEF_PREFIX     "64:ff9b::"
-#define IPV6_DEF_MASKBITS   96
+#define IPV6_DEF_PREFIX			"64:ff9b::"
+#define IPV6_DEF_MASKBITS   	96
+#define IPV6_DEF_MASKBITS_MAX   96
+#define IPV6_DEF_MASKBITS_MIN   32
 //
 #define IPV6_DEF_TCP_POOL_FIRST 1024		// FIXME: Rename to IPV6_DEF_TCP_PORTS_FIRST
 #define IPV6_DEF_TCP_POOL_LAST  65535		// 		  Same thing
@@ -46,6 +48,13 @@
 // STRUCTURES
 ////////////////////////////////////////////////////////////////////////
 
+struct ipv6_prefixes 
+{
+	struct in6_addr addr;
+	unsigned char maskbits;
+};
+
+
 struct config_struct
 {
     //// IPv4:
@@ -61,8 +70,10 @@ struct config_struct
     unsigned short ipv4_udp_port_last;
     
     //// IPv6:
-    struct in6_addr ipv6_net_prefix;
-	unsigned char   ipv6_net_mask_bits;
+    //~ struct in6_addr ipv6_net_prefix;
+	//~ unsigned char   ipv6_net_mask_bits;
+	struct ipv6_prefixes **ipv6_net_prefixes;
+	unsigned char 		   ipv6_net_prefixes_qty;
     //
 	unsigned short  ipv6_tcp_port_range_first;
 	unsigned short  ipv6_tcp_port_range_last;

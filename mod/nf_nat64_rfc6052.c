@@ -1,6 +1,7 @@
 #include "nf_nat64_rfc6052.h"
 
-__be32 nat64_extract_ipv4(struct in6_addr addr, int prefix)
+//__be32 nat64_extract_ipv4(struct in6_addr addr, int prefix)
+__be32 nat64_extract_ipv4(struct in6_addr addr, unsigned char prefix)
 {
 	switch(prefix) {
 		case 32:
