@@ -1,19 +1,33 @@
+/**
+ * @file 	xt_nat64_module_conf.h
+ *
+ * @brief 	Updates the configuration of module, both times when just inserted
+ * 			and when a new config is received through a netlink socket.
+ *
+ */
 #ifndef _XT_NAT64_MODULE_CONF_H
 #define _XT_NAT64_MODULE_CONF_H
 
 /*
  * Communication with the NAT64 module (using netlink sockets).
  */
-#ifndef _LOAD_CONFIG_H_
+//~ #ifndef _LOAD_CONFIG_H_
+//~ #ifdef _NF_NAT64_IPV4_POOL_H
+#ifdef _USER_SPACE_
+//~ #ifndef _NAT64_CONFIG_VALIDATION_H_
+//~ #ifndef _NAT64_CONFIG_VALIDATION_H_ || _LOAD_CONFIG_H_
+	#include <netinet/in.h>
+#else
 	#include <linux/in.h>
 	#include <linux/in6.h>
+
 #endif
 
 ////////////////////////////////////////////////////////////////////////
 // DEFAULT VALUES (Communication)
 ////////////////////////////////////////////////////////////////////////
 
-#define MY_MSG_TYPE (0x10 + 2)  // + 2 is arbitrary but is the same for kern/usr
+//#define MY_MSG_TYPE (0x10 + 2)  ///< Netlink socket packet ID, + 2 is arbitrary but is the same for kern/usr
 
 ////////////////////////////////////////////////////////////////////////
 // DEFAULT VALUES (Configuration)
@@ -70,8 +84,6 @@ struct config_struct
     unsigned short ipv4_udp_port_last;
     
     //// IPv6:
-    //~ struct in6_addr ipv6_net_prefix;
-	//~ unsigned char   ipv6_net_mask_bits;
 	struct ipv6_prefixes **ipv6_net_prefixes;
 	unsigned char 		   ipv6_net_prefixes_qty;
     //
@@ -88,6 +100,7 @@ struct config_struct
 ////////////////////////////////////////////////////////////////////////
 
 int init_nat_config(struct config_struct *cs);
+
 int update_nat_config(struct config_struct *cst);
 
 

@@ -12,8 +12,10 @@
 #include "nf_nat64_determine_incoming_tuple.h"
 #include "nf_nat64_translate_packet.h"
 #include "xt_nat64_module_conf.h"
+#include "xt_nat64_module_comm.h"
 #include "nf_nat64_bib_session.h"
 #include "nf_nat64_static_routes.h"
+#include "nat64_config_validation.h"
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Juan Antonio Osorio <jaosorior@gmail.com>"); // TODO poner a toda la raza
@@ -37,7 +39,7 @@ MODULE_ALIAS("ip6t_nat64");
  * 		  Linux NAT64 implementation.
  */
 
-
+static char buffer[22];
 /* IPv4 */
 extern struct in_addr ipv4_pool_net; // Se puede mover a la estructura de config.
 extern struct in_addr ipv4_pool_range_first; // igual.
@@ -70,24 +72,62 @@ int my_rcv_msg(struct sk_buff *skb, struct nlmsghdr *nlh)
     int type;
      struct config_struct *cst;
 
+	char *data;
+	int pid;
+	int res;
+	struct sk_buff *skb_out;
+
     type = nlh->nlmsg_type;
-    if (type != MY_MSG_TYPE) {
-        pr_debug("NAT64:     netlink: %s: expect %#x got %#x\n", 
-        		 __func__, MY_MSG_TYPE, type);
+    if (type != MSG_TYPE_ROUTE && type != MSG_TYPE_CONF) 
+	{
+        pr_debug("NAT64:     netlink: %s: expecting %#x or %#x but got %#x\n", 
+        		 __func__, MSG_TYPE_CONF, MSG_TYPE_ROUTE, type);
         return -EINVAL;
     }
 
-	cst = NLMSG_DATA(nlh);
-    pr_debug("NAT64:     netlink: got message.\n" );
-    pr_debug("NAT64:     netlink: updating NAT64 configuration.\n" );
-
-	if (update_nat_config(cst) != 0)
+	if (type == MSG_TYPE_CONF )
 	{
-		pr_debug("NAT64:     netlink: Error while updating NAT64 running configuration\n");
-		return -EINVAL;
+
+		cst = NLMSG_DATA(nlh);
+		pr_debug("NAT64:     netlink: got message.\n" );
+		pr_debug("NAT64:     netlink: updating NAT64 configuration.\n" );
+
+		if (update_nat_config(cst) != 0)
+		{
+			pr_debug("NAT64:     netlink: Error while updating NAT64 running configuration\n");
+			return -EINVAL;
+		}
+	
+		pr_debug("NAT64:     netlink: Running configuration successfully updated");
 	}
 	
-	pr_debug("NAT64:     netlink: Running configuration successfully updated");
+	if ( type == MSG_TYPE_ROUTE )
+	{
+		data = NLMSG_DATA(nlh);
+
+    	nat64_add_static_route(data, buffer);
+		pid = nlh->nlmsg_pid; /*pid of sending process */
+
+		skb_out = nlmsg_new(sizeof(buffer),0);
+
+		if(!skb_out)	
+		{
+			pr_info("Failed to allocate new skb");
+			return -EINVAL;
+		} 
+
+		nlh=nlmsg_put(skb_out,0,0,NLMSG_DONE,sizeof(buffer),0);  
+		NETLINK_CB(skb_out).dst_group = 0; /* not in mcast group */
+		strncpy(nlmsg_data(nlh),buffer,sizeof(buffer));
+
+		res = nlmsg_unicast(my_nl_sock,skb_out,pid);
+
+		if(res < 0) 
+		{
+	   		pr_info("Error while sending back to user");
+		}
+		
+	}
 
     return 0;
 }

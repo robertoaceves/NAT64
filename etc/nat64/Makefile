@@ -18,16 +18,21 @@ $(info Compiling on kernel family 3)
 endif
 
 # Programs to compile:
-progs = load_config 
+progs = load_config static_route 
 
 default: all
 
 all: $(progs)
 
-load_config:load_config.o include/confuse.o include/lexer.o
+load_config:load_config.o include/confuse.o include/lexer.o nat64_config_validation.o
 load_config.o: load_config.c
 include/confuse.o:include/confuse.c
 include/lexer.o:include/lexer.c
+
+nat64_config_validation.o: nat64_config_validation.c
+
+static_route: static_route.o
+static_route.o: static_route.c
 
 #%.o: %.c
 

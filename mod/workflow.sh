@@ -1,6 +1,7 @@
 #!/bin/bash
 
-config_file="../etc/nat64_configuration/nat64.conf"
+user_space_dir="../etc/nat64"
+config_file="$user_space_dir/nat64.conf"
 if [ -f "$config_file" ]; then
 	pool_net=`awk '/ipv4_addr_net[ =]/{printf "%s/",$3} /ipv4_addr_net_mask_bits/{printf "%d\n",$3}' "$config_file"`
 	pref64=`awk '/ipv6_net_prefixes/{ gsub(/"/,"",$4); gsub(/,/,"",$4); print $4} ' "$config_file"`
@@ -63,7 +64,7 @@ elif [ $1 = "setup" ] ; then
 	sudo ./workflow.sh "ins"
 elif [ $1 = "conf" ] ; then
 	echo "Sending configuration to the module"
-	pushd ../etc/nat64_configuration > /dev/null
+	pushd "$user_space_dir" > /dev/null
 	./load_config nat64.conf
 	popd > /dev/null
 else
