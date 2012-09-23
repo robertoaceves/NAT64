@@ -53,10 +53,10 @@ int main(int argc, char *argv[])
         CFG_INT("ipv4_addr_net_mask_bits", IPV4_DEF_MASKBITS, CFGF_NONE), 
         CFG_STR("ipv4_pool_range_first", IPV4_DEF_POOL_FIRST, CFGF_NONE), 
         CFG_STR("ipv4_pool_range_last", IPV4_DEF_POOL_LAST, CFGF_NONE), 
-        CFG_INT("ipv4_tcp_port_range_first", IPV4_DEF_TCP_POOL_FIRST, CFGF_NONE), 
-        CFG_INT("ipv4_tcp_port_range_last", IPV4_DEF_TCP_POOL_LAST, CFGF_NONE), 
-        CFG_INT("ipv4_udp_port_range_first", IPV4_DEF_UDP_POOL_FIRST, CFGF_NONE), 
-        CFG_INT("ipv4_udp_port_range_last", IPV4_DEF_UDP_POOL_LAST, CFGF_NONE), 
+        CFG_INT("ipv4_tcp_port_range_first", IPV4_DEF_TCP_PORTS_FIRST, CFGF_NONE), 
+        CFG_INT("ipv4_tcp_port_range_last", IPV4_DEF_TCP_PORTS_LAST, CFGF_NONE), 
+        CFG_INT("ipv4_udp_port_range_first", IPV4_DEF_UDP_PORTS_FIRST, CFGF_NONE), 
+        CFG_INT("ipv4_udp_port_range_last", IPV4_DEF_UDP_PORTS_LAST, CFGF_NONE), 
         CFG_END()
     };
 
@@ -66,10 +66,10 @@ int main(int argc, char *argv[])
 	cfg_opt_t ipv6_opts[] =
     {
         CFG_STR_LIST("ipv6_net_prefixes", ipv6_def_prefix64, CFGF_NONE), 
-        CFG_INT("ipv6_tcp_port_range_first", IPV6_DEF_TCP_POOL_FIRST, CFGF_NONE), 
-        CFG_INT("ipv6_tcp_port_range_last", IPV6_DEF_TCP_POOL_LAST, CFGF_NONE), 
-        CFG_INT("ipv6_udp_port_range_first", IPV6_DEF_UDP_POOL_FIRST, CFGF_NONE), 
-        CFG_INT("ipv6_udp_port_range_last", IPV6_DEF_UDP_POOL_LAST, CFGF_NONE), 
+        CFG_INT("ipv6_tcp_port_range_first", IPV6_DEF_TCP_PORTS_FIRST, CFGF_NONE), 
+        CFG_INT("ipv6_tcp_port_range_last", IPV6_DEF_TCP_PORTS_LAST, CFGF_NONE), 
+        CFG_INT("ipv6_udp_port_range_first", IPV6_DEF_UDP_PORTS_FIRST, CFGF_NONE), 
+        CFG_INT("ipv6_udp_port_range_last", IPV6_DEF_UDP_PORTS_LAST, CFGF_NONE), 
 		CFG_END()
     };
     // Define two sections in config file

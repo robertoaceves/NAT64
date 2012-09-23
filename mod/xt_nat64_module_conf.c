@@ -10,18 +10,16 @@
 // VARIABLES
 ////////////////////////////////////////////////////////////////////////
 
-/**
- *
- */
-struct config_struct cs;
+struct config_struct cs; /**< This struct holds the entire valid and running configuration. */
 
 
-/* IPv4. These are global. Reference using extern, please. */
+///@{ IPv4. These are global. Reference using extern, please. 
 extern struct in_addr ipv4_pool_net;
 extern struct in_addr ipv4_pool_range_first;
 extern struct in_addr ipv4_pool_range_last;
 extern int ipv4_mask_bits;
 extern __be32 ipv4_netmask;	// TODO change data type -> 'in_addr' type. Rob.
+///@}
 
 /* IPv6. These ones are also global. */
 extern char *ipv6_pref_addr_str;
@@ -42,15 +40,15 @@ int init_nat_config(struct config_struct *cs)
 	
 	/* IPv4 */
 	// Validate IPv4 Pool Network
-    if (! in4_pton(IPV4_DEF_NET, -1, (u8 *)&ipv4_pool_net.s_addr, '\x0', NULL)) {
-        pr_warning("NAT64: IPv4 pool net in Headers is malformed [%s].", IPV4_DEF_NET);
+    if (! in4_pton(IPV4_DEF_POOL_NET, -1, (u8 *)&ipv4_pool_net.s_addr, '\x0', NULL)) {
+        pr_warning("NAT64: IPv4 pool net in Headers is malformed [%s].", IPV4_DEF_POOL_NET);
         return -EINVAL;
     }
 	// Validate IPv4 Pool - Netmask
-	ipv4_mask_bits = IPV4_DEF_MASKBITS;	// Num. of bits 'on' in the net mask
+	ipv4_mask_bits = IPV4_DEF_POOL_NET_MASK_BITS;	// Num. of bits 'on' in the net mask
     if (ipv4_mask_bits > 32 || ipv4_mask_bits < 1) {
         pr_warning("NAT64: IPv4 Pool netmask bits value is invalid [%d].",
-                IPV4_DEF_MASKBITS);
+                IPV4_DEF_POOL_NET_MASK_BITS);
         return -EINVAL;
     }
 	ipv4_netmask = inet_make_mask(ipv4_mask_bits);
@@ -67,16 +65,16 @@ int init_nat_config(struct config_struct *cs)
     }
 
 	// Assing IPv4 values to config struct.
-    (*cs).ipv4_addr_net = ipv4_pool_net;
-	(*cs).ipv4_addr_net_mask_bits = ipv4_mask_bits;
+    (*cs).ipv4_pool_net = ipv4_pool_net;
+	(*cs).ipv4_pool_net_mask_bits = ipv4_mask_bits;
 	(*cs).ipv4_pool_range_first = ipv4_pool_range_first;
 	(*cs).ipv4_pool_range_last = ipv4_pool_range_last;
     //
-    (*cs).ipv4_tcp_port_first = IPV4_DEF_TCP_POOL_FIRST;
-    (*cs).ipv4_tcp_port_last = IPV4_DEF_TCP_POOL_LAST;
+    (*cs).ipv4_tcp_port_first = IPV4_DEF_TCP_PORTS_FIRST;
+    (*cs).ipv4_tcp_port_last = IPV4_DEF_TCP_PORTS_LAST;
     //
-    (*cs).ipv4_udp_port_first = IPV4_DEF_UDP_POOL_FIRST;
-    (*cs).ipv4_udp_port_last = IPV4_DEF_UDP_POOL_LAST;
+    (*cs).ipv4_udp_port_first = IPV4_DEF_UDP_PORTS_FIRST;
+    (*cs).ipv4_udp_port_last = IPV4_DEF_UDP_PORTS_LAST;
 
 
 	/* IPv6 */
@@ -104,16 +102,16 @@ int init_nat_config(struct config_struct *cs)
 	(*(*cs).ipv6_net_prefixes[0]) = ip6p;
 	(*cs).ipv6_net_prefixes_qty = 1;
     //
-	(*cs).ipv6_tcp_port_range_first = IPV6_DEF_TCP_POOL_FIRST;
-	(*cs).ipv6_tcp_port_range_last = IPV6_DEF_TCP_POOL_LAST;
+	(*cs).ipv6_tcp_port_range_first = IPV6_DEF_TCP_PORTS_FIRST;
+	(*cs).ipv6_tcp_port_range_last = IPV6_DEF_TCP_PORTS_LAST;
 	//
-	(*cs).ipv6_udp_port_range_first = IPV6_DEF_UDP_POOL_FIRST;
-    (*cs).ipv6_udp_port_range_last = IPV6_DEF_UDP_POOL_LAST;
+	(*cs).ipv6_udp_port_range_first = IPV6_DEF_UDP_PORTS_FIRST;
+    (*cs).ipv6_udp_port_range_last = IPV6_DEF_UDP_PORTS_LAST;
 
 
 	pr_debug("NAT64: Initial (default) configuration loaded:");
 	pr_debug("NAT64:	using IPv4 pool subnet %pI4/%d (netmask %pI4),",
-			  &((*cs).ipv4_addr_net), (*cs).ipv4_addr_net_mask_bits, &ipv4_netmask);
+			  &((*cs).ipv4_pool_net), (*cs).ipv4_pool_net_mask_bits, &ipv4_netmask);
 	pr_debug("NAT64:	and IPv6 prefix %pI6c/%d.",
 			  &((*cs).ipv6_net_prefixes[0]->addr), (*cs).ipv6_net_prefixes[0]->maskbits);
 
@@ -140,7 +138,7 @@ int update_nat_config(struct config_struct *cst)
 
 	pr_debug("NAT64: Updating configuration:");
 	pr_debug("NAT64:	using IPv4 pool subnet %pI4/%d (netmask %pI4),",
-			  &(cs.ipv4_addr_net), (cs).ipv4_addr_net_mask_bits, &ipv4_netmask);
+			  &(cs.ipv4_pool_net), (cs).ipv4_pool_net_mask_bits, &ipv4_netmask);
 	qty = (cs).ipv6_net_prefixes_qty;
 	for (i = 0; i < qty; i++)
 	{
@@ -150,6 +148,8 @@ int update_nat_config(struct config_struct *cst)
 
 	// Update IPv4 addresses pool
     init_pools(&cs); // Bernardo
+
+
 
 	// Should we free cst?
 	

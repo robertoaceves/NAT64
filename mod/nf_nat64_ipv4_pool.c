@@ -1,4 +1,5 @@
 #include "nf_nat64_ipv4_pool.h"
+#include <linux/inetdevice.h>
 
 __be32 next_udp_address; // FIXME: Rob. Think of changing this datatype to: struct in_addr
 __be32 next_tcp_address;
@@ -152,6 +153,18 @@ void init_pools(struct config_struct *cs)
 	next_tcp_port = first_tcp_port;
 	last_tcp_port = (*cs).ipv4_tcp_port_last; // LAST_PORT;
 	last_udp_port = (*cs).ipv4_udp_port_last;
+
+	//~ (*cs).ipv4_pool_net = ipv4_pool_net;
+	//~ (*cs).ipv4_pool_net_mask_bits = ipv4_mask_bits;
+	//~ (*cs).ipv4_pool_range_first = ipv4_pool_range_first;
+	//~ (*cs).ipv4_pool_range_last = ipv4_pool_range_last;
+
+	ipv4_netmask = inet_make_mask((*cs).ipv4_pool_net_mask_bits);
+	ipv4_pool_net = (*cs).ipv4_pool_net; // For the sake of correctness
+	ipv4_pool_range_first = (*cs).ipv4_pool_range_first;
+	ipv4_pool_range_last = (*cs).ipv4_pool_range_last;
+	
+
 
 	r1 = swap_endians(next_udp_address);
 	r2 = swap_endians(last_address);

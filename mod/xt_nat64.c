@@ -15,7 +15,7 @@
 #include "xt_nat64_module_comm.h"
 #include "nf_nat64_bib_session.h"
 #include "nf_nat64_static_routes.h"
-#include "nat64_config_validation.h"
+#include "xt_nat64_module_conf_validation.h"
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Juan Antonio Osorio <jaosorior@gmail.com>"); // TODO poner a toda la raza

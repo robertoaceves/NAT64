@@ -39,59 +39,70 @@
 #define IPV6_DEF_MASKBITS_MAX   96
 #define IPV6_DEF_MASKBITS_MIN   32
 //
-#define IPV6_DEF_TCP_POOL_FIRST 1024		// FIXME: Rename to IPV6_DEF_TCP_PORTS_FIRST
-#define IPV6_DEF_TCP_POOL_LAST  65535		// 		  Same thing
+#define IPV6_DEF_TCP_PORTS_FIRST 1024
+#define IPV6_DEF_TCP_PORTS_LAST  65535
 //
-#define IPV6_DEF_UDP_POOL_FIRST 1024		// FIXME: Rename to IPV6_DEF_UDP_PORTS_FIRST
-#define IPV6_DEF_UDP_POOL_LAST  65535		// 		  Same thing
+#define IPV6_DEF_UDP_PORTS_FIRST 1024
+#define IPV6_DEF_UDP_PORTS_LAST  65535
 // IPv4:
-#define IPV4_DEF_NET        "192.168.2.0" 	// FIXME: Rename to IPV4_DEF_POOL_NET
-#define IPV4_DEF_MASKBITS   24				// FIXME: Rename to IPV4_DEF_POOL_NET_MASK_BITS
+#define IPV4_DEF_POOL_NET	"192.168.2.0"
+#define IPV4_DEF_POOL_NET_MASK_BITS   24
 //
 #define IPV4_DEF_POOL_FIRST "192.168.2.1"
 #define IPV4_DEF_POOL_LAST  "192.168.2.254"
 //
-#define IPV4_DEF_TCP_POOL_FIRST 1024		// FIXME: Rename to IPV4_DEF_TCP_PORTS_FIRST
-#define IPV4_DEF_TCP_POOL_LAST  65535		// 		  Same thing
+#define IPV4_DEF_TCP_PORTS_FIRST 1024
+#define IPV4_DEF_TCP_PORTS_LAST  65535
 //
-#define IPV4_DEF_UDP_POOL_FIRST 1024		// FIXME: Rename to IPV4_DEF_UDP_PORTS_FIRST
-#define IPV4_DEF_UDP_POOL_LAST  65535		// 		  Same thing
+#define IPV4_DEF_UDP_PORTS_FIRST 1024
+#define IPV4_DEF_UDP_PORTS_LAST  65535
 
 
 ////////////////////////////////////////////////////////////////////////
 // STRUCTURES
 ////////////////////////////////////////////////////////////////////////
 
+/**
+ * Struct to handle valid IPv6 prefixes specified as configuration parameters.
+ */
 struct ipv6_prefixes 
 {
-	struct in6_addr addr;
-	unsigned char maskbits;
+	struct in6_addr addr;	///< IPv6 prefix
+	unsigned char maskbits;	///< Network mask in CIDR format.
 };
 
-
+/**
+ * This holds the entire running and valid configuration.
+ */
 struct config_struct
 {
     //// IPv4:
-    struct in_addr ipv4_addr_net; 			// FIXME: Rename this to ipv4_pool_net
-	unsigned char  ipv4_addr_net_mask_bits; // FIXME: Rename this to ipv4_pool_net_mask_bits
-	struct in_addr ipv4_pool_range_first;
-	struct in_addr ipv4_pool_range_last;
+    struct in_addr ipv4_pool_net; 				/**< IPv4 Pool network address. */
+	unsigned char  ipv4_pool_net_mask_bits; 	/**< IPv4 Pool network address, in CIDR format. */
+	struct in_addr ipv4_pool_range_first;		/**< IPv4 Pool first valid address. */
+	struct in_addr ipv4_pool_range_last;		/**< IPv4 Pool last valid address. */
     //
-    unsigned short ipv4_tcp_port_first;
+    /// Maybe this should disappear to satisfy requirements about ports handling, as defined in RFC6146. 
+    ///@{
+    unsigned short ipv4_tcp_port_first;		/**< Valid range of TCP ports. */
     unsigned short ipv4_tcp_port_last;
     //
-    unsigned short ipv4_udp_port_first;
+    unsigned short ipv4_udp_port_first;		/**< Valid range of UDP ports. */
     unsigned short ipv4_udp_port_last;
+	///@} 
     
     //// IPv6:
-	struct ipv6_prefixes **ipv6_net_prefixes;
-	unsigned char 		   ipv6_net_prefixes_qty;
+	struct ipv6_prefixes **ipv6_net_prefixes;		/**< Array of valid prefixes. */
+	unsigned char 		   ipv6_net_prefixes_qty;	/**< Length of the array. */
     //
-	unsigned short  ipv6_tcp_port_range_first;
+    /// Maybe this should disappear to satisfy requirements about ports handling, as defined in RFC6146. 
+    ///@{
+	unsigned short  ipv6_tcp_port_range_first;		/**< Valid range of TCP ports. */
 	unsigned short  ipv6_tcp_port_range_last;
 	//
-	unsigned short  ipv6_udp_port_range_first;
-    unsigned short  ipv6_udp_port_range_last;   
+	unsigned short  ipv6_udp_port_range_first;		/**< Valid range of UDP ports. */
+    unsigned short  ipv6_udp_port_range_last; 
+    ///@} 
 };
 
 

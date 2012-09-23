@@ -13,8 +13,8 @@ else
 
 fi
 
-echo "=== pool_net: $pool_net"
-echo "=== pref64: $pref64"
+#echo "=== pool_net: $pool_net"
+#echo "=== pref64: $pref64"
 
 if [ $1 = "ins" ] ; then
 	sudo modprobe ipv6

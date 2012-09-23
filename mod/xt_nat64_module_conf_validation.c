@@ -68,7 +68,14 @@ int validate_ipv4_netmask_bits(unsigned char netmask_bits)
 	return (EXIT_SUCCESS);
 }
 
-
+/**
+ * Convert the network mask in CIDR format ('/n') to address format.
+ *
+ * @param[in] 	af		Address Family: AF_INET[6].
+ * @param[in] 	bits	Network mask bits, integer value from: /n.
+ * @param[out] 	net		Network mask in address format.
+ * @return		EXIT_SUCCESS if OK, otherwise EXIT_FAILURE.
+ */
 int convert_bits_to_netmask(int af, unsigned char bits, void *net)
 {
 
@@ -111,6 +118,15 @@ int convert_bits_to_netmask(int af, unsigned char bits, void *net)
 	return EXIT_SUCCESS;	
 }
 
+/**
+ * Obtain the network address of an IP address.
+ *
+ * @param[in] 	af			Address Family: AF_INET[6].
+ * @param[in] 	ip_addr		IP address.
+ * @param[in] 	ip_netmask	Network mask in address format.
+ * @param[out] 	ip_net		Network address.
+ * @return		EXIT_SUCCESS if OK, otherwise EXIT_FAILURE.
+ */
 int get_net_addr(int af, void *ip_addr, void *ip_netmask, void *ip_net)
 {
 	unsigned char ii = 0;
@@ -142,6 +158,14 @@ int get_net_addr(int af, void *ip_addr, void *ip_netmask, void *ip_net)
 	return EXIT_SUCCESS;
 }
 
+/**
+ * Verify if two IP addresses are different.
+ *
+ * @param[in] 	af			Address Family: AF_INET[6].
+ * @param[in] 	addr_1		First IP address.
+ * @param[in] 	addr_2		Second IP address.
+ * @return		EXIT_SUCCESS if they are equal, otherwise return EXIT_FAILURE.
+ */
 int ip_addr_are_diff(int af, void *addr_1, void *addr_2) 
 {
 	switch (af)
@@ -166,6 +190,16 @@ int ip_addr_are_diff(int af, void *addr_1, void *addr_2)
 	return EXIT_SUCCESS;
 }
 
+/**
+ * Check that first and last pool addresses belongs to the same network.
+ *
+ * @param[in] 	af			Address Family: AF_INET[6].
+ * @param[in] 	network		Pool's network address.
+ * @param[in] 	maskbits		Net mask in CIDR format ('/N').
+ * @param[in] 	addr_first		First IP address.
+ * @param[in] 	addr_last		Last IP address.
+ * @return		EXIT_SUCCESS if all they belong to the same net, otherwise return EXIT_FAILURE.
+ */
 int ip_addr_in_same_net(int af, 
 			const void *network, unsigned char maskbits,
 	       	const void *addr_first, const void *addr_last)
@@ -194,7 +228,8 @@ int ip_addr_in_same_net(int af,
 
 			break;
 		case AF_INET6:
-			// TODO: implement a me!
+			// TODO?: implement  me
+			// Is thís necesary?
 			//convert_bits_to_netmask(af, ipv6_bits, &ipv6_netmask);
 			break;
 		default:
