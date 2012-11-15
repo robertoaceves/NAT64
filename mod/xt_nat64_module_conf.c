@@ -31,25 +31,29 @@ extern unsigned char ipv6_pref_len;	// Var type verified ;). Rob
  * Default configuration, until it be set up by the user space application.
  *
  * @param cs		Config struct where default values will be dropped.
+ * @return      TRUE if all was fine, FALSE otherwise.
  */
 int init_nat_config(struct config_struct *cs)
 {
 	struct ipv6_prefixes ip6p;
-	
-//	int i = 0;
+
+	// TODO: Define & Set values for operational parameters:
+	(*cs).address_dependent_filtering = 0;	//<<< TODO: Use a define for this value!
+	(*cs).filter_informational_icmpv6 = 0;	//<<< TODO: Use a define for this value!
+
 	
 	/* IPv4 */
 	// Validate IPv4 Pool Network
     if (! in4_pton(IPV4_DEF_POOL_NET, -1, (u8 *)&ipv4_pool_net.s_addr, '\x0', NULL)) {
         pr_warning("NAT64: IPv4 pool net in Headers is malformed [%s].", IPV4_DEF_POOL_NET);
-        return -EINVAL;
+        return false;
     }
 	// Validate IPv4 Pool - Netmask
 	ipv4_mask_bits = IPV4_DEF_POOL_NET_MASK_BITS;	// Num. of bits 'on' in the net mask
     if (ipv4_mask_bits > 32 || ipv4_mask_bits < 1) {
         pr_warning("NAT64: IPv4 Pool netmask bits value is invalid [%d].",
                 IPV4_DEF_POOL_NET_MASK_BITS);
-        return -EINVAL;
+        return false;
     }
 	ipv4_netmask = inet_make_mask(ipv4_mask_bits);
 	ipv4_pool_net.s_addr = ipv4_pool_net.s_addr & ipv4_netmask; // For the sake of correctness
@@ -57,11 +61,11 @@ int init_nat_config(struct config_struct *cs)
 	// Validate IPv4 Pool - First and Last addresses .
 	if (! in4_pton(IPV4_DEF_POOL_FIRST, -1, (u8 *)&ipv4_pool_range_first.s_addr, '\x0', NULL)) {
         pr_warning("NAT64: IPv4 pool net in Headers is malformed [%s].", IPV4_DEF_POOL_FIRST);
-        return -EINVAL;
+        return false;
     }
     if (! in4_pton(IPV4_DEF_POOL_LAST, -1, (u8 *)&ipv4_pool_range_last.s_addr, '\x0', NULL)) {
         pr_warning("NAT64: IPv4 pool net in Headers is malformed [%s].", IPV4_DEF_POOL_LAST);
-        return -EINVAL;
+        return false;
     }
 
 	// Assing IPv4 values to config struct.
@@ -81,12 +85,12 @@ int init_nat_config(struct config_struct *cs)
     // Validate IPv6 prefix
 	if (! in6_pton(IPV6_DEF_PREFIX, -1, (u8 *)&(ip6p.addr), '\0', NULL)) {
         pr_warning("NAT64: IPv6 prefix in Headers is malformed [%s].", IPV6_DEF_PREFIX);
-        return -EINVAL;
+        return false;
     }
     if (IPV6_DEF_MASKBITS > IPV6_DEF_MASKBITS_MAX || IPV6_DEF_MASKBITS < IPV6_DEF_MASKBITS_MIN)
 	{
 		pr_warning("NAT64: Bad IPv6 network mask bits value in Headers: %d\n", IPV6_DEF_MASKBITS);
-		return -EINVAL;
+		return false;
 	}
     ip6p.maskbits = IPV6_DEF_MASKBITS;
 
@@ -115,7 +119,7 @@ int init_nat_config(struct config_struct *cs)
 	pr_debug("NAT64:	and IPv6 prefix %pI6c/%d.",
 			  &((*cs).ipv6_net_prefixes[0]->addr), (*cs).ipv6_net_prefixes[0]->maskbits);
 
-	return 0; // Alles Klar!
+	return true; // Alles Klar!
 }
 
 /**

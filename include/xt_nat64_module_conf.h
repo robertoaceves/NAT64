@@ -76,6 +76,10 @@ struct ipv6_prefixes
  */
 struct config_struct
 {
+	//// Operational:
+	unsigned char address_dependent_filtering;	/**< Use Address-Dependent Filtering? */
+	unsigned char filter_informational_icmpv6;	/**< Filter ICMPv6 Informational packets */
+	
     //// IPv4:
     struct in_addr ipv4_pool_net; 				/**< IPv4 Pool network address. */
 	unsigned char  ipv4_pool_net_mask_bits; 	/**< IPv4 Pool network address, in CIDR format. */

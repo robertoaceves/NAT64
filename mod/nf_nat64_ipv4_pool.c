@@ -1,5 +1,6 @@
 #include "nf_nat64_ipv4_pool.h"
 #include <linux/inetdevice.h>
+//~ #include <linux/in.h>
 
 __be32 next_udp_address; // FIXME: Rob. Think of changing this datatype to: struct in_addr
 __be32 next_tcp_address;
@@ -29,7 +30,7 @@ unsigned char ipv6_pref_len;	// Var type verified ;). Rob
 
 
 
-static __be32 swap_endians(__be32 be)
+__be32 swap_endians(__be32 be)
 {
 	__be32 le = ((be & 0xFF) << 24) //
 	        | ((be & 0xFF00) << 8) //
@@ -38,7 +39,7 @@ static __be32 swap_endians(__be32 be)
 	return le;
 }
 
-static char *ip_address_to_string(__be32 ip)
+char* ip_address_to_string(__be32 ip)
 {
 	char *result = (char *) kmalloc((sizeof(char)) * INET_ADDRSTRLEN,
 	        GFP_ATOMIC);
@@ -54,7 +55,7 @@ static char *ip_address_to_string(__be32 ip)
 
 // FIXME: Why is this function converting "new_transport_addr->address" to string??, and in the function 
 //		  nat64_bib_session_create() changes it back to "in_addr"
-static struct transport_addr_struct *get_transport_addr(struct list_head *head,
+struct transport_addr_struct *get_transport_addr(struct list_head *head,
         int *next_address, int *next_port, int *first_port, int *last_port)
 {
 	if (list_empty(head) == 1) { // if the list is empty

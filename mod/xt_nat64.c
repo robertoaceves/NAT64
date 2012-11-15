@@ -18,7 +18,7 @@
 #include "xt_nat64_module_conf_validation.h"
 
 MODULE_LICENSE("GPL");
-MODULE_AUTHOR("Juan Antonio Osorio <jaosorior@gmail.com>"); // TODO poner a toda la raza
+MODULE_AUTHOR("ITESM-NIC <msordia@itesm.mx>"); // TODO poner a toda la raza
 MODULE_DESCRIPTION("Xtables: RFC 6146 \"NAT64\" implementation");
 MODULE_ALIAS("ipt_nat64");
 MODULE_ALIAS("ip6t_nat64");

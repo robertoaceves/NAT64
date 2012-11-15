@@ -153,16 +153,6 @@ int main(int argc, char *argv[])
             printf("Error: Invalid %s ports range.\n", which);
             exit_error_conf(cfg);
         }
-        //~ if (port_last < 0 || port_last > 65535)
-        //~ {
-            //~ printf("Error: Invalid last %s port: %d\n", which, port_last);
-            //~ exit_error_conf(cfg);
-        //~ }
-        //~ if (port_first > port_last)
-        //~ {
-            //~ printf("Error: First %s port is greater than last port.\n", which);
-            //~ exit_error_conf(cfg);
-        //~ }
         cs.ipv4_tcp_port_first = port_first;
         cs.ipv4_tcp_port_last = port_last;
 		printf("\t%s pool port range: %d-%d\n", which, port_first, port_last);
@@ -175,21 +165,6 @@ int main(int argc, char *argv[])
             printf("Error: Invalid %s ports range.\n", which);
             exit_error_conf(cfg);
         }
-        //~ if (port_first < 0 || port_first > 65535)
-        //~ {
-            //~ printf("Error: Invalid first %s port: %d\n", which, port_first);
-            //~ exit_error_conf(cfg);
-        //~ }
-        //~ if (port_last < 0 || port_last > 65535)
-        //~ {
-            //~ printf("Error: Invalid last %s port: %d\n", which, port_last);
-            //~ exit_error_conf(cfg);
-        //~ }
-        //~ if (port_first > port_last)
-        //~ {
-            //~ printf("Error: First %s port is greater than last port.\n", which);
-            //~ exit_error_conf(cfg);
-        //~ }
         cs.ipv4_udp_port_first = port_first;
         cs.ipv4_udp_port_last = port_last;
 		printf("\t%s pool port range: %d-%d\n", which, port_first, port_last);
@@ -251,21 +226,6 @@ int main(int argc, char *argv[])
             printf("Error: Invalid %s ports range.\n", which);
             exit_error_conf(cfg);
         }
-        //~ if (port_first < 0 || port_first > 65535)
-        //~ {
-            //~ printf("Error: Invalid first %s port: %d\n", which, port_first);
-            //~ exit_error_conf(cfg);
-        //~ }
-        //~ if (port_last < 0 || port_last > 65535)
-        //~ {
-            //~ printf("Error: Invalid last %s port: %d\n", which, port_last);
-            //~ exit_error_conf(cfg);
-        //~ }
-        //~ if (port_first > port_last)
-        //~ {
-            //~ printf("Error: First %s port is greater than last port.\n", which);
-            //~ exit_error_conf(cfg);
-        //~ }
         cs.ipv6_tcp_port_range_first = port_first;
         cs.ipv6_tcp_port_range_last = port_last;
 		printf("\t%s pool port range: %d-%d\n", which, port_first, port_last);
@@ -278,21 +238,6 @@ int main(int argc, char *argv[])
             printf("Error: Invalid %s ports range.\n", which);
             exit_error_conf(cfg);
         }
-        //~ if (port_first < 0 || port_first > 65535)
-        //~ {
-            //~ printf("Error: Invalid first %s port: %d\n", which, port_first);
-            //~ exit_error_conf(cfg);
-        //~ }
-        //~ if (port_last < 0 || port_last > 65535)
-        //~ {
-            //~ printf("Error: Invalid last %s port: %d\n", which, port_last);
-            //~ exit_error_conf(cfg);
-        //~ }
-        //~ if (port_first > port_last)
-        //~ {
-            //~ printf("Error: First %s port is greater than last port.\n", which);
-            //~ exit_error_conf(cfg);
-        //~ }
         cs.ipv6_udp_port_range_first = port_first;
         cs.ipv6_udp_port_range_last = port_last;
 		printf("\t%s pool port range: %d-%d\n", which, port_first, port_last);
